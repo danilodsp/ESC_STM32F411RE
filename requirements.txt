@@ -1,0 +1,19 @@
+# requirements.txt
+
+# Core libraries
+numpy==1.24.3
+scipy==1.10.1
+pandas==1.5.3
+
+# Audio processing
+librosa==0.10.1
+soundfile==0.12.1
+
+# Machine learning
+tensorflow==2.13.0
+scikit-learn==1.2.2
+matplotlib==3.7.1
+
+# Optional (for dataset handling / audio viz)
+tqdm==4.65.0
+IPython==8.12.2
