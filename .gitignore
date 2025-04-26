@@ -1,3 +1,16 @@
+## ML
+features/
+logs/
+model_data/
+*.ldupdatedone
+
+## Data
+*.npy
+
+## VSCode
+.vscode/
+.github/
+
 ## C++
 # Prerequisites
 *.d

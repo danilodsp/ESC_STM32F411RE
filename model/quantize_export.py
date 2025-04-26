@@ -1,60 +1,55 @@
-"""
-Model quantization and export script for TensorFlow Lite.
+# quantize_export.py
 
-Converts a trained Keras model to TFLite format with optional quantization.
-"""
 import argparse
+import os
 import tensorflow as tf
+import numpy as np
 
-def quantize_and_export(
-    saved_model_dir: str = "saved_model",
-    tflite_path: str = "model.tflite",
-    quantize: bool = True
-) -> None:
-    """
-    Convert a TensorFlow SavedModel to TFLite format with optional quantization.
+def load_representative_dataset(X_path, num_samples=100):
+    X = np.load(X_path)
+    if len(X.shape) == 3:
+        X = np.expand_dims(X, axis=-1)
 
-    Args:
-        saved_model_dir (str): Path to the SavedModel directory.
-        tflite_path (str): Output path for the TFLite model.
-        quantize (bool): Whether to apply default quantization.
-    """
+    for i in range(min(num_samples, len(X))):
+        sample = X[i:i+1].astype(np.float32)
+        yield [sample]
+
+def export_tflite(saved_model_dir, output_path, quantize_int8=False, X_path=None):
+    """Exports TFLite model with optional int8 quantization."""
     converter = tf.lite.TFLiteConverter.from_saved_model(saved_model_dir)
-    if quantize:
-        converter.optimizations = [tf.lite.Optimize.DEFAULT]
-    model_tflite = converter.convert()
-    with open(tflite_path, "wb") as f:
-        f.write(model_tflite)
-    print(f"TFLite model exported to {tflite_path}")
+    converter.optimizations = [tf.lite.Optimize.DEFAULT]
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Quantize and export a TensorFlow SavedModel to TFLite."
-    )
-    parser.add_argument(
-        '--saved_model_dir',
-        type=str,
-        default='saved_model',
-        help='Path to the SavedModel directory.'
-    )
-    parser.add_argument(
-        '--tflite_path',
-        type=str,
-        default='model.tflite',
-        help='Output path for the TFLite model.'
-    )
-    parser.add_argument(
-        '--no_quantize',
-        action='store_true',
-        help='Disable quantization.'
-    )
+    if quantize_int8:
+        if X_path is None:
+            raise ValueError("Representative dataset (X.npy) is required for int8 quantization.")
+
+        converter.representative_dataset = lambda: load_representative_dataset(X_path)
+        converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
+        converter.inference_input_type = tf.int8
+        converter.inference_output_type = tf.int8
+
+    tflite_model = converter.convert()
+
+    with open(output_path, "wb") as f:
+        f.write(tflite_model)
+
+    print(f"✅ Exported TFLite model to {output_path}")
+
+def main():
+    parser = argparse.ArgumentParser(description="Export TFLite model (float32 or int8).")
+    parser.add_argument('--saved_model_dir', type=str, default='saved_model', help='Path to SavedModel directory.')
+    parser.add_argument('--output_path', type=str, default='model.tflite', help='Output TFLite file path.')
+    parser.add_argument('--int8', action='store_true', help='Enable full int8 quantization.')
+    parser.add_argument('--X_path', type=str, default='prepared_data/X.npy', help='Path to X.npy for representative dataset.')
+    
     args = parser.parse_args()
-    quantize_and_export(
-        saved_model_dir=args.saved_model_dir,
-        tflite_path=args.tflite_path,
-        quantize=not args.no_quantize
-    )
 
+    export_tflite(
+        saved_model_dir=args.saved_model_dir,
+        output_path=args.output_path,
+        quantize_int8=args.int8,
+        X_path=args.X_path
+    )
 
 if __name__ == "__main__":
     main()

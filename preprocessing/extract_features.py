@@ -36,8 +36,8 @@ def extract_logmel(
     """
     try:
         y, _ = librosa.load(audio_path, sr=sr)
-        y = librosa.util.fix_length(y, int(sr * duration))
-        mel = librosa.feature.melspectrogram(y, sr=sr, n_mels=n_mels)
+        y = librosa.util.fix_length(data=y, size=int(sr * duration))
+        mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels)
         logmel = librosa.power_to_db(mel).T
         return logmel
     except Exception as e:
