@@ -27,16 +27,24 @@ This project implements a Convolutional Neural Network (CNN)-based Environmental
 ```
 ESC_STM32F411RE/
 ├── Dataset/
-│   ├── UrbanSound8K/
-│   └── Preprocessed/
-├── Model/
+│   └── UrbanSound8K/
+├── model/
+│   ├── extract_features.py
+│   ├── benchmark_tflite.py
+│   ├── evaluate_tflite.py
+│   ├── compare_models.py
+│   ├── esc_cnn.py
 │   ├── train_model.py
-│   ├── model.h5
-│   └── quantized_model.tflite
-├── STM32/
+│   ├── prepare_dataset.py
+│   ├── quantize_model.py
+│   ├── train_urbansound.py
+│   └── train.py
+├── firmware(STM32)/
 │   ├── Core/
 │   ├── Drivers/
-│   └── Inc/
+│   └── model_data/
+│       ├── model.tflite
+│       └── best_model.h5
 ├── README.md
 └── LICENSE
 ```
@@ -52,17 +60,14 @@ ESC_STM32F411RE/
     - Then, `qunatize_model.py` will quantize the model for STM32 deployment.
     - Run all evaluation scripts to check the model performance.
 
-2. **STM32 Deployment**:
+2. **STM32 Deployment, Build and Flash**:
     - Import the quantized model into STM32Cube.AI.
-    - Generate the C code and integrate it into the STM32 project.
-
-3. **Build and Flash**:
-    - Use STM32CubeIDE to build the project.
+    - Integrate C code it into the STM32 project.
     - Flash the firmware onto the STM32F411RE board.
 
 ## Usage
 
-- Connect a microphone to the STM32F411RE board (check pins used in the STM project).
+- Connect a microphone to the STM32F411RE board (check out pins used in the STM project).
 - Run the firmware to classify real-time audio input.
 - The classification results will be displayed via UART.
 
