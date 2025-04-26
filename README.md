@@ -43,45 +43,39 @@ ESC_STM32F411RE/
 
 ## Getting Started
 
-1. **Dataset Preparation**:
+1. **Dataset Preparation, Model Training and Model Quantization**:
     - Download the UrbanSound8K dataset from [UrbanSound8K](https://urbansounddataset.weebly.com/urbansound8k.html).
-    - Preprocess the dataset using `train_model.py`.
+    - First, extract features from the audio files using `extract_features.py` or `main.py`.
+    - Then, run `model/prepare_dataset.py` to prepare the features.
+    - The dataset will be split into training and validation sets.
+    - Now, run `train_model.py` or `train_urbansound.py` to train the model.
+    - Then, `qunatize_model.py` will quantize the model for STM32 deployment.
+    - Run all evaluation scripts to check the model performance.
 
-2. **Model Training**:
-    - Train the CNN model using the preprocessed dataset.
-    - Save the trained model as `model.h5`.
-
-3. **Model Quantization**:
-    - Convert the trained model to TensorFlow Lite format using `tflite_convert`.
-    - Quantize the model for embedded deployment.
-
-4. **STM32 Deployment**:
+2. **STM32 Deployment**:
     - Import the quantized model into STM32Cube.AI.
     - Generate the C code and integrate it into the STM32 project.
 
-5. **Build and Flash**:
+3. **Build and Flash**:
     - Use STM32CubeIDE to build the project.
     - Flash the firmware onto the STM32F411RE board.
 
 ## Usage
 
-- Connect a microphone to the STM32F411RE board.
+- Connect a microphone to the STM32F411RE board (check pins used in the STM project).
 - Run the firmware to classify real-time audio input.
-- The classification results will be displayed via UART or an attached display.
+- The classification results will be displayed via UART.
 
-## Future Work
+## Model Architecture
 
-- Improve model accuracy with advanced preprocessing techniques.
-- Optimize inference speed for real-time applications.
-- Add support for additional datasets and sound classes.
+<img src="docs/model.tflite.png" alt="Model Architecture" width="200"/>
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## Acknowledgments
 
 - UrbanSound8K dataset authors for providing the dataset.
 - STM32Cube.AI for enabling embedded AI deployment.
 - TensorFlow/Keras for model development tools.
-- Open-source contributors for their valuable tools and libraries.
